@@ -15,7 +15,7 @@
   <!-- Top Navbar -->
   <nav class="navbar navbar-expand-lg fixed-top">
     <div class="container-fluid">
-      <a class="navbar-brand" href="index.html">MyTutorials</a>
+      <a class="navbar-brand" href="../index.html">MyTutorials</a>
       <div class="collapse navbar-collapse">
         <ul class="navbar-nav m-auto">
           <li class="nav-item"><a class="nav-link" href="../htmls.html">HTML</a></li>
@@ -50,8 +50,8 @@
         <button class="copy-btn" onclick="copyCode(this)">Copy</button>
         <pre><code class="language-html">
         <xmp>
-               // Category.php
-              class Category extends Model
+               // app/models/Category.php
+              
               {
                   public function products()
                   {
@@ -59,8 +59,8 @@
                   }
               }
 
-              // Product.php
-              class Product extends Model
+              // app/models/Product.php
+
               {
                   public function category()
                   {
@@ -290,10 +290,117 @@ Step 3: Blade File (View):
 
 
 
+    <h1>Alternate Method</h1>
+
+    <!-- To display subcategory by category in Larave -->
+
+    <h3>2. To display Product by category in Larave</h3>
+    <p>Laravel এ যদি আপনি প্রতিটি Category অনুযায়ী product গুলো দেখাতে চান, তাহলে আপনাকে নিচের পদ্ধতি আনুসরন করতে হবে।</p>
+
+
+    Step 1: Web Routes
+
+    <div class="code-container">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-html">
+    <xmp>
+
+    Route::controller(PageController::class)->group(function(){
+      Route::get('/pages/categoryPage/{id}/{slug}', 'categoryPage')->name('pages.categoryPage');
+    
+     });
+
+     </xmp>
+      </code></pre>
+    </div>
+
+
+    Step 2: Controller
+
+    <div class="code-container">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-html">
+    <xmp>
+
+    //product display by category id
+      public function categoryPage($id){
+        $categories = Category::all();//category show in menubar
+        
+        //product display by category_id
+        $category_id = Post::where('category_id', $id)->value('category_id');
+        $posts = Post::where('category_id', $category_id)->latest()->get();
+        
+        return view('pages.categoryPage', compact('categories','posts'));
+
+    }
+
+
+    </xmp>
+    </code></pre>
+    </div> 
+
+
+    Step 3: categoryPage.blade.php
+
+    <div class="code-container">
+    <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+    <pre><code class="language-html">
+    <xmp>
+
+    <section class="py-5 bg-light" id="projects">
+    <div class="container">
+      <h2 class="text-center mb-5" data-aos="fade-up">My Projects</h2>
+
+      <!-- Category Filter Buttons -->
+      <div class="text-center mb-5" data-aos="zoom-in">
+        <a href="{{route('homePage')}}">
+          <button class="btn btn-outline-dark me-2 filter-btn active" data-filter="all">All</button>
+        </a>
+        
+       @foreach ($categories as $data)
+        <a href="{{route('pages.categoryPage',[$data->id, $data->slug], )}}">{{Str::limit($data->category_name, 15)}}</a>
+        @endforeach
+        
+      </div>
+
+      <!-- Project Cards -->
+      <div class="row g-4">
+        @if($posts->isEmpty())
+              
+        <h2 class="mt-5">Data Not Found....</h2>
+        
+        @else
+        
+        @forelse($posts as $post)
+        <div class="col-md-4 project-item" data-category="laravel" data-aos="fade-up">
+          <a href="{{$post->link_name}}">
+            <div class="card project-card">
+            <img src="{{asset('uploads/image/'.$post->post_image)}}" class="card-img-top" alt="Project">
+            <div class="card-body">
+              <h5 class="card-title">{{$post->title}}</h5>
+              <p class="card-text"></p>
+            </div>
+          </div>
+          </a>
+        </div>
+        @endforeach
+        @endif
+      </div>
+    </div>
+  </section>
+
+
+    </xmp>
+    </code></pre>
+    </div> 
 
 
 
-              </div>
+
+
+
+
+  </div>
 
 
 
